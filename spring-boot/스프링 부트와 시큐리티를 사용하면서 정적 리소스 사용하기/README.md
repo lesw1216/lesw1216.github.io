@@ -1,0 +1,76 @@
+# 스프링 부트와 시큐리티를 사용하면서 정적 리소스 사용하기
+
+스프링 부트와 시큐리티를 사용하면서 css, js 등 정적 Resource를 사용하기 위해서 추가적인 설정이 필요하다.
+
+# Web MVC 설정
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .setCachePeriod(0);
+
+    }
+}
+```
+`addResourceHandler()`을 `/**`로 설정하였다. 이 의미는 `/` 아래의 모든 요청에 resource를 제공하는 것이다. 
+
+`addResourceLocations()`는 `ResourceHandler`가 제공하는 `Resource`를 `classpath:/static/` 아래에서 찾도록 설정하는 부분이다.
+
+`setCachePeriod()`는 정적 resource를 브라우저가 캐시를 얼마나 오래 유지할지 설정하는 것이다. 여기서 `setCachePeriod(0)`으로 설정하면 이제 매번 서버에 리소스를 다시 요청한다.
+
+# Security 설정
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests.requestMatchers("/sign-up", "/login", "/css/**", "/js/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+
+                .formLogin(formLogin -> formLogin.loginPage("/login"));
+
+        return http.build();
+    }
+}
+```
+
+`authorizeRequests.requestMatcher()` 부분을 보자. 허용하는 url pattern은 다음과 같다.
+
+1. `/sign-up` - 회원 가입 URL 패턴
+
+2. `/login` - 로그인 URL 패턴
+ 
+3. `/css/**` - CSS 파일이 저장되어 있는 위치
+
+4. `/js/**` - JS 파일이 저장되어 있는 위치
+
+css는 `/css` 아래에 위치 시켜놓고, js는 `/js` 아래에 위치 시키면 된다.
+
+실제 저장 위치는 다음과 같다. `/resource/static/css`, `/resource/static/js`이다. 스프링 부트는 `/resource/static`을 `/`로 인식한다. 따라서 우리가 위에 3, 4 번을 `/css`와 `/js`로 설정한 것이다.
+
+# 실제 HTML에 적용하기
+```html
+<head>
+    <meta charset="UTF-8">
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script src="../static/js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <title>로그인</title>
+</head>
+```
+
+`<link>`와 `<script>`을 보자. `src`와 `href`는 실제 경로를 입력하여 서버가 실행중이지 않을 때에도 정적 리소스를 사용 할 수 있도록 하였다.
+
+다음은 `th:src`와 `th:href`이다. 실제 서버가 실행되었을 때는 해당 속성이 기존의 `href`와 `src`를 대체한다. 이때 경로가 `/css`, `/js`임을 주의 깊게 보자.
