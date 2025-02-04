@@ -1,3 +1,8 @@
+---
+layout: default
+title: home
+---
+
 # 목차
 * [WEB](#web)
 * [JAVA](#java)
