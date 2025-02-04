@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # HTTP 메시지 로그로 확인하는 방법
 `application.properties`에 아래와 같이 작성
 ```properties

@@ -6,3 +6,5 @@ defaults:
       path: ""  # 모든 파일 적용
     values:
       layout: "default"
+
+markdown: kramdown
