@@ -1,2 +1,8 @@
 title: "WIKI"
 include: ["_sidebar.md"]
+
+defaults:
+  - scope:
+      path: ""  # 모든 파일 적용
+    values:
+      layout: "default"
