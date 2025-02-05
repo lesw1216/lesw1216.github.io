@@ -1,5 +1,5 @@
 title: "WIKI"
-include: ["sidebar.md"]
+include: [_includes/sidebar.md]
 
 defaults:
   - scope:
