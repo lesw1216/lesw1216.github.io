@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 성공 시 사용자 권한 별 리다이렉트 페이지 분리</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="로그인-성공-시-사용자-권한-별로-리다이렉트-페이지-분리하기">로그인 성공 시 사용자 권한 별로 리다이렉트 페이지 분리하기</h1>
+
+<p><a href="https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html#servlet-authentication-abstractprocessingfilter">관련 참조 문서</a></p>
+
+<p><img src="/assets/images/spring/AbstractAuthenticationProcessingFilter.png" alt="AbstractAuthenticationProcessingFilter" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">AbstractAuthenticationProcessingFilter</code>는 인증이 성공하면 <code class="language-plaintext highlighter-rouge">AuthenticationSuccessHandler</code>가 <code class="language-plaintext highlighter-rouge">onAuthenticationSuccess()</code>를 호출한다.</p>
+
+<p>우리는 이 <code class="language-plaintext highlighter-rouge">onAuthenticationSuccess()</code>를 구현하여 로그인 성공 시 사용자 권한 별로 리다이렉트를 나눌 수 있다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationSuccessHandler</span> <span class="kd">implements</span> <span class="nc">AuthenticationSuccessHandler</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationSuccess</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">ServletException</span> <span class="o">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[CustomAuthenticationSuccessHandler] onAuthenticationSuccess() CALL"</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">authentication</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">new</span> <span class="nc">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">"ROLE_USER"</span><span class="o">)))</span> <span class="o">{</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">sendRedirect</span><span class="o">(</span><span class="s">"/"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">authentication</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">new</span> <span class="nc">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">"ROLE_ADMIN"</span><span class="o">)))</span> <span class="o">{</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">sendRedirect</span><span class="o">(</span><span class="s">"/admin"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">sendRedirect</span><span class="o">(</span><span class="s">"/login?error=unauthorized"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">AuthenticationSuccessHandler</code>를 구현하여 <code class="language-plaintext highlighter-rouge">onAuthenticationSuccess()</code>를 완성해주자. 완성한 <code class="language-plaintext highlighter-rouge">CustomAuthenticationSuccessHandler</code>를 스프링 시큐리티가 사용하도록 설정해주자.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">SecurityFilterChain</span> <span class="nf">securityFilterChain</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+
+        <span class="n">http</span>
+                <span class="o">.</span><span class="na">formLogin</span><span class="o">(</span><span class="n">formLogin</span> <span class="o">-&gt;</span> <span class="n">formLogin</span>
+                        <span class="o">.</span><span class="na">loginPage</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">loginProcessingUrl</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">defaultSuccessUrl</span><span class="o">(</span><span class="s">"/home"</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">successHandler</span><span class="o">(</span><span class="k">new</span> <span class="nc">CustomAuthenticationSuccessHandler</span><span class="o">())</span>
+                <span class="o">)</span>
+
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">formLogin</code>과 관련된 설정만 가져왔다. 여기서 <code class="language-plaintext highlighter-rouge">formLogin().successHandler(new CustomAuthenticationSuccessHandler())</code>로 직접 구현한 handler를 넣어준다.</p>
+
+  </div>
+  
+</body>
+
+</html>

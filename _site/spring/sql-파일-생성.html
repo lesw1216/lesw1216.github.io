@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL 파일 생성</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="sql-파일-생성하기">SQL 파일 생성하기</h1>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">schema.sql</code> : 테이블과 같은 스키마 정의</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">data.sql</code> : 초기 데이터를 삽입하는 SQL</p>
+  </li>
+</ul>
+
+<p>기본적으로 파일 위치는 <code class="language-plaintext highlighter-rouge">/resources</code> 바로 아래에 두는 것이 원칙이다. 하지만 설정을 통해 스프링 부트가 스캔하는 위치를 지정 할 수 있다.</p>
+
+<p>주의할 점으로는, 두개의 파일이 <code class="language-plaintext highlighter-rouge">db/</code>에 있다고 해서 <code class="language-plaintext highlighter-rouge">classpath:db/</code>로 설정 할 수 없다는 것이다. <code class="language-plaintext highlighter-rouge">schema.sql</code>과 <code class="language-plaintext highlighter-rouge">data.sql</code> 따로 위치를 지정해주어야 한다.</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">spring.sql.init.schema-locations</span><span class="p">=</span><span class="s">classpath:db/schema.sql</span>
+<span class="py">spring.sql.init.data-locations</span><span class="p">=</span><span class="s">classpath:db/data.sql</span>
+</code></pre></div></div>
+
+<p>그리고 테스트에도 사용 될 수 있다.</p>
+
+  </div>
+  
+</body>
+
+</html>

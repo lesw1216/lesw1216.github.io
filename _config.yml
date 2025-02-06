@@ -1,10 +1,93 @@
-title: "WIKI"
-include: [_includes/sidebar.md]
 
 defaults:
-  - scope:
-      path: ""  # 모든 파일 적용
+  - 
+  
+    scope:
+      path: _java
+      type: java
+    values:
+      layout: default
+      tag: java
+      category: java
+
+  -
+
+    scope:
+      path: _menus
+      type: details
+    values:
+      layout: default
+      tag: menus
+      category: menus
+
+  -
+
+    scope:
+      path: _db
+      type: db
+    values:
+      tag: db
+      category: db
+
+  -
+
+    scope:
+      path: _spring
+      type: spring
+    values:
+      tag: spring
+      category: spring
+
+  -
+
+    scope:
+      path: _web
+      type: web
+    values:
+      tag: web
+      category: web
+
+  -
+
+    scope:
+      path: _securitys
+      type: securitys
+    values:
+      tag: securitys
+      category: securitys
+
+  - 
+  
+    scope:
+        path: ""  # 모든 파일 적용
     values:
       layout: "default"
 
-markdown: kramdown
+collections_dir: contents
+
+collections:
+  java:
+    output: true
+    permalink: /:collection/:title
+  spring:
+    output: true
+    permalink: /:collection/:title
+  db:
+    output: true
+    permalink: /:collection/:title
+  web:
+    output: true
+    permalink: /:collection/:title
+  securitys:
+    output: true
+    permalink: /:collection/:title
+  menus:
+    output: true
+    permalink: /:collection/:title
+    order:
+      - JAVA.md
+      - SPRING.md
+      - WEB.md
+      - DB.md
+      - securitys.md
+      - ERROR해결.md

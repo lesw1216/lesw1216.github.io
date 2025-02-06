@@ -1,9 +1,24 @@
 ---
-layout: default
 title: home
 ---
 
-# 목차
+# HOME
+
+----
+
+{% for menu in site.menus %}
+# {{ menu.title }}
+  {% for c in site.collections %}
+   {% if c.label == menu.title %}
+   {% for item in c.docs %}
+   - [{{ item.title }}]({{ item.url }})
+   {% endfor %}
+   {% endif %}
+  {% endfor %}
+  ----
+{% endfor %}
+
+<!-- # 목차
 * [WEB](#web)
 * [JAVA](#java)
 * [DB](#db)
@@ -47,4 +62,4 @@ title: home
 * [MyBatis 세팅](/DB/MyBatis세팅/)
 * [Mapper 클래스 테스트](/DB/Mapper클래스테스트하기/)
 
-# 보안
+# 보안 -->

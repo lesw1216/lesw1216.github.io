@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스프링 부트 서버 실행 시 관리자 계정 자동으로 생성하기</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="스프링-서버-실행-시-관리자-계정-추가하기">스프링 서버 실행 시 관리자 계정 추가하기</h1>
+<p>서버를 실행 할 때 관리자 계정을 기본적으로 추가해야 한다.</p>
+
+<p>스프링 부트는 서버가 실행되면서 같이 코드를 실행할 수 있게 지원해주는데 이는 <code class="language-plaintext highlighter-rouge">CommandLineRunner</code>, <code class="language-plaintext highlighter-rouge">ApplicationRunner</code> 인터페이스를 구현하여 수행 할 수 있다.</p>
+
+<p>이 두개의 인터페이스는 <code class="language-plaintext highlighter-rouge">SpringApplication.run()</code>이 완료되기 전에 호출된다.</p>
+
+<p>이 둘의 차이점은 다음과 같다.</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">CommandLineRunner</code> - application argument에 String array가 들어온다.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ApplicationRunner</code> - application argument에 <code class="language-plaintext highlighter-rouge">ApplicationArgument</code> 타임의 객체가 들어온다.</p>
+  </li>
+</ul>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">ApplicationArgument</code> 인터페이스</p>
+
+  <p><code class="language-plaintext highlighter-rouge">SpringApplication.run()</code>의 매개변수로 받은 문자열 배열과 파싱된 option, non-option 인자에 대한 액세스를 제공하는 인터페이스다. 구현체는 <code class="language-plaintext highlighter-rouge">DefaultApplicationArgument</code>가 있다.</p>
+</blockquote>
+
+<h2 id="다수의-commandlinerunner-applicationrunner가-존재하는-경우">다수의 CommandLineRunner, ApplicationRunner가 존재하는 경우</h2>
+
+<p>다수의 구현체들이 존재하는 경우 <code class="language-plaintext highlighter-rouge">configure</code>를 생성하여 실행되는 순서를 지정할 수 있다. 이때, <code class="language-plaintext highlighter-rouge">Ordered</code> 인터페이스를 구현하거나, <code class="language-plaintext highlighter-rouge">Order</code> 어노테이션을 사용한다.</p>
+
+<h1 id="commandlinerunner-실제-적용하기">CommandLineRunner 실제 적용하기</h1>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span>
+<span class="nd">@Component</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdminAccountInitializer</span> <span class="kd">implements</span> <span class="nc">CommandLineRunner</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">MemberService</span> <span class="n">memberService</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="nc">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">adminEmail</span> <span class="o">=</span> <span class="s">"관리자 계정 아이디"</span><span class="o">;</span>
+        <span class="nc">String</span> <span class="n">password</span> <span class="o">=</span> <span class="s">"관리자 계정 비밀번호"</span><span class="o">;</span>
+
+        <span class="nc">MemberIdPwdDTO</span> <span class="n">memberIdPwdDTO</span> <span class="o">=</span> <span class="nc">MemberIdPwdDTO</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">email</span><span class="o">(</span><span class="n">adminEmail</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">password</span><span class="o">(</span><span class="n">password</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+        <span class="nc">Member</span> <span class="n">savedAdmin</span> <span class="o">=</span> <span class="n">memberService</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">memberIdPwdDTO</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Saved admin: {}"</span><span class="o">,</span> <span class="n">savedAdmin</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>관리자를 저장하기 위해 <code class="language-plaintext highlighter-rouge">MemberService</code>를 주입해주었다. 주의할 점은 <code class="language-plaintext highlighter-rouge">AdminAccountInitializer</code>는 bean으로 등록되어야 한다.</p>
+
+  </div>
+  
+</body>
+
+</html>

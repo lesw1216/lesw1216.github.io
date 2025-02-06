@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>시큐리티를 사용할 때 정적리소스 허용하기</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="스프링-부트와-시큐리티를-사용하면서-정적-리소스-사용하기">스프링 부트와 시큐리티를 사용하면서 정적 리소스 사용하기</h1>
+
+<p>스프링 부트와 시큐리티를 사용하면서 css, js 등 정적 Resource를 사용하기 위해서 추가적인 설정이 필요하다.</p>
+
+<h1 id="web-mvc-설정">Web MVC 설정</h1>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableWebMvc</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebConfig</span> <span class="kd">implements</span> <span class="nc">WebMvcConfigurer</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addResourceHandlers</span><span class="o">(</span><span class="nc">ResourceHandlerRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">registry</span><span class="o">.</span><span class="na">addResourceHandler</span><span class="o">(</span><span class="s">"/**"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">addResourceLocations</span><span class="o">(</span><span class="s">"classpath:/static/"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">setCachePeriod</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">addResourceHandler()</code>을 <code class="language-plaintext highlighter-rouge">/**</code>로 설정하였다. 이 의미는 <code class="language-plaintext highlighter-rouge">/</code> 아래의 모든 요청에 resource를 제공하는 것이다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">addResourceLocations()</code>는 <code class="language-plaintext highlighter-rouge">ResourceHandler</code>가 제공하는 <code class="language-plaintext highlighter-rouge">Resource</code>를 <code class="language-plaintext highlighter-rouge">classpath:/static/</code> 아래에서 찾도록 설정하는 부분이다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">setCachePeriod()</code>는 정적 resource를 브라우저가 캐시를 얼마나 오래 유지할지 설정하는 것이다. 여기서 <code class="language-plaintext highlighter-rouge">setCachePeriod(0)</code>으로 설정하면 이제 매번 서버에 리소스를 다시 요청한다.</p>
+
+<h1 id="security-설정">Security 설정</h1>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableWebSecurity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="o">{</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">SecurityFilterChain</span> <span class="nf">securityFilterChain</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+
+        <span class="n">http</span>
+                <span class="o">.</span><span class="na">authorizeHttpRequests</span><span class="o">(</span><span class="n">authorizeRequests</span> <span class="o">-&gt;</span>
+                        <span class="n">authorizeRequests</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/sign-up"</span><span class="o">,</span> <span class="s">"/login"</span><span class="o">,</span> <span class="s">"/css/**"</span><span class="o">,</span> <span class="s">"/js/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+                <span class="o">)</span>
+
+                <span class="o">.</span><span class="na">formLogin</span><span class="o">(</span><span class="n">formLogin</span> <span class="o">-&gt;</span> <span class="n">formLogin</span><span class="o">.</span><span class="na">loginPage</span><span class="o">(</span><span class="s">"/login"</span><span class="o">));</span>
+
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">authorizeRequests.requestMatcher()</code> 부분을 보자. 허용하는 url pattern은 다음과 같다.</p>
+
+<ol>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">/sign-up</code> - 회원 가입 URL 패턴</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">/login</code> - 로그인 URL 패턴</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">/css/**</code> - CSS 파일이 저장되어 있는 위치</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">/js/**</code> - JS 파일이 저장되어 있는 위치</p>
+  </li>
+</ol>
+
+<p>css는 <code class="language-plaintext highlighter-rouge">/css</code> 아래에 위치 시켜놓고, js는 <code class="language-plaintext highlighter-rouge">/js</code> 아래에 위치 시키면 된다.</p>
+
+<p>실제 저장 위치는 다음과 같다. <code class="language-plaintext highlighter-rouge">/resource/static/css</code>, <code class="language-plaintext highlighter-rouge">/resource/static/js</code>이다. 스프링 부트는 <code class="language-plaintext highlighter-rouge">/resource/static</code>을 <code class="language-plaintext highlighter-rouge">/</code>로 인식한다. 따라서 우리가 위에 3, 4 번을 <code class="language-plaintext highlighter-rouge">/css</code>와 <code class="language-plaintext highlighter-rouge">/js</code>로 설정한 것이다.</p>
+
+<h1 id="실제-html에-적용하기">실제 HTML에 적용하기</h1>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">"../static/css/bootstrap.min.css"</span> <span class="na">th:href=</span><span class="s">"@{/css/bootstrap.min.css}"</span> <span class="na">rel=</span><span class="s">"stylesheet"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"../static/js/bootstrap.bundle.min.js"</span> <span class="na">th:src=</span><span class="s">"@{/js/bootstrap.bundle.min.js}"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;title&gt;</span>로그인<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">&lt;link&gt;</code>와 <code class="language-plaintext highlighter-rouge">&lt;script&gt;</code>을 보자. <code class="language-plaintext highlighter-rouge">src</code>와 <code class="language-plaintext highlighter-rouge">href</code>는 실제 경로를 입력하여 서버가 실행중이지 않을 때에도 정적 리소스를 사용 할 수 있도록 하였다.</p>
+
+<p>다음은 <code class="language-plaintext highlighter-rouge">th:src</code>와 <code class="language-plaintext highlighter-rouge">th:href</code>이다. 실제 서버가 실행되었을 때는 해당 속성이 기존의 <code class="language-plaintext highlighter-rouge">href</code>와 <code class="language-plaintext highlighter-rouge">src</code>를 대체한다. 이때 경로가 <code class="language-plaintext highlighter-rouge">/css</code>, <code class="language-plaintext highlighter-rouge">/js</code>임을 주의 깊게 보자.</p>
+
+  </div>
+  
+</body>
+
+</html>

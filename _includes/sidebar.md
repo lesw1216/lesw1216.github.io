@@ -1,4 +1,6 @@
-## 카테고리
 
-* [Home](/)
-* [HTTP 요청 메시지 로그로 확인하기](/WEB/HTTP요청메시지로그확인하기/)
+[Home](/)
+
+{% for menu in site.menus %}
+[{{ menu.title }}]({{ menu.url }})
+{% endfor %}

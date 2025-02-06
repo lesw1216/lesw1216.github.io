@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAVA 21 버전 사용시 인텔리제이에서 한글이 깨지는 현상</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="java-버전-21을-사용-시-인텔리제이-콘솔-한글-깨짐">JAVA 버전 21을 사용 시 인텔리제이 콘솔 한글 깨짐</h1>
+<ol>
+  <li>
+    <p>편집으로 들어간다</p>
+
+    <p><img src="/assets/images/java/IDE편집창열기.png" alt="편집" /></p>
+  </li>
+  <li>
+    <p>VM 옵션을 설정한다. 이 때, vm 옵션이 없다면 옵션 수정을 클릭해 VM 옵션을 추가하자.</p>
+
+    <p><img src="/assets/images/java/IDE_실행_디버그_구성창.png" alt="alt text" /></p>
+  </li>
+  <li>
+    <p>다음과 같은 옵션을 추가한다.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">-Dfile.encoding="UTF-8" -Dsun.stderr.encoding="UTF-8" -Dsun.stdout.encoding="UTF-8"</code></p>
+  </li>
+</ol>
+
+  </div>
+  
+</body>
+
+</html>

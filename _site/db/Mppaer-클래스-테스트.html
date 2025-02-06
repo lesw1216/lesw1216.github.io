@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapper 클래스 테스트</title>
+  <link rel="stylesheet" href="/assets/css/syntax.css" />
+  <link rel="stylesheet" href="/assets/css/default.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  
+  <div class="sidebar">
+    
+    
+<p><a href="/">Home</a></p>
+
+<p><a href="/menus/JAVA">java</a></p>
+
+<p><a href="/menus/SPRING">spring</a></p>
+
+<p><a href="/menus/WEB">web</a></p>
+
+<p><a href="/menus/DB">db</a></p>
+
+<p><a href="/menus/securitys">securitys</a></p>
+
+<p><a href="/menus/ERROR%ED%95%B4%EA%B2%B0">ERROR 해결</a></p>
+
+
+  </div>
+  <div class="content">
+    <h1 id="mapper-클래스-테스트-하기">Mapper 클래스 테스트 하기</h1>
+
+<p>Mapper를 사용하면서 작성하는 테스트는 다음과 같이 나눌 수 있다. 아래의 방법 모두 MyBatis를 사용한 테스트는 <code class="language-plaintext highlighter-rouge">@MyBatisTest</code>를 이용해 테스트를 진행 할 수 있다.</p>
+
+<h2 id="1-mapper-클래스-단독-사용">1. Mapper 클래스 단독 사용</h2>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MyBatisTest</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">test</span> <span class="o">{</span>
+    
+    <span class="nd">@Autowired</span>
+    <span class="nc">Mapper</span> <span class="n">mapper</span><span class="o">;</span>
+
+    <span class="c1">// 이하 생략 ...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="2-repository-내부에-mapper-클래스-사용">2. Repository 내부에 Mapper 클래스 사용</h2>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MyBatisTest</span>
+<span class="nd">@Import</span><span class="o">(</span><span class="nc">Repository</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// 실제로 들어가는 값은 Mapper를 주입 받는 구현체 클래스. 예) @Import(WorkoutRepository.class)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">test</span> <span class="o">{</span>
+    
+    <span class="nd">@Autowired</span>
+    <span class="nc">Repository</span> <span class="n">repository</span><span class="o">;</span> <span class="c1">// 인터페이스 사용</span>
+
+    <span class="c1">// ...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">@MyBatisTest</code>는 MyBatis 테스트만을 위한 필수 값만을 빈으로 등록한다. 따라서 1번과 같은 Mapper 단독은 <code class="language-plaintext highlighter-rouge">@MyBatis</code>만 사용하여도 되지만, 2번과 같은 Mapper를 주입 받는 Repository를 사용한다면 해당 Repository를 개별적으로 추가해주어야 한다.</p>
+
+  </div>
+  
+</body>
+
+</html>
